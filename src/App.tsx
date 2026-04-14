@@ -15,16 +15,15 @@ function AppRoutes() {
     localStorage.getItem(ONBOARDING_KEY) === 'true'
   );
 
+  function handleReset() {
+    resetWorkouts();
+    setHasOnboarded(false);
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0f0d1a] text-slate-800 dark:text-slate-100 transition-colors duration-300">
       <Routes>
-        {/* Onboarding — shown only on first visit, no Navbar */}
-        <Route
-          path="/welcome"
-          element={<Onboarding onComplete={() => setHasOnboarded(true)} />}
-        />
-
-        {/* Main app routes */}
+        <Route path="/welcome" element={<Onboarding onComplete={() => setHasOnboarded(true)} />} />
         <Route
           path="/*"
           element={
@@ -34,7 +33,7 @@ function AppRoutes() {
                 <Routes>
                   <Route path="/" element={<Dashboard entries={entries} onLog={logWorkout} />} />
                   <Route path="/history" element={<History entries={entries} />} />
-                  <Route path="/settings" element={<Settings onReset={resetWorkouts} />} />
+                  <Route path="/settings" element={<Settings onReset={handleReset} />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </>
