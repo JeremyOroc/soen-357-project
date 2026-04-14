@@ -1,6 +1,10 @@
+import { useEffect, useRef, useState } from 'react';
+
 interface WeeklyRingProps {
   /** Array of ISO date strings (YYYY-MM-DD) that have been logged */
   loggedDays: string[];
+  /** Trigger a pulse animation when a new workout is logged */
+  pulse?: boolean;
 }
 
 const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -19,17 +23,30 @@ function getWeekDates(): string[] {
 const R = 54;
 const C = 2 * Math.PI * R;
 
-export default function WeeklyRing({ loggedDays }: WeeklyRingProps) {
+export default function WeeklyRing({ loggedDays, pulse = false }: WeeklyRingProps) {
   const week = getWeekDates();
   const loggedSet = new Set(loggedDays);
   const count = week.filter(d => loggedSet.has(d)).length;
   const pct = count / 7;
-  const dash = C * pct;
+
+  // Animate ring fill from 0 on mount
+  const [displayDash, setDisplayDash] = useState(0);
+  const mountedRef = useRef(false);
+  useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      // Start at 0, then transition to actual value after a short delay
+      const t = setTimeout(() => setDisplayDash(C * pct), 80);
+      return () => clearTimeout(t);
+    } else {
+      setDisplayDash(C * pct);
+    }
+  }, [pct]);
 
   return (
     <div className="flex flex-col items-center gap-5">
       {/* SVG Ring */}
-      <div className="relative w-36 h-36">
+      <div className={`relative w-36 h-36 transition-transform duration-300 ${pulse ? 'scale-110' : 'scale-100'}`}>
         <svg className="w-full h-full -rotate-90" viewBox="0 0 128 128">
           {/* Track */}
           <circle
@@ -46,8 +63,9 @@ export default function WeeklyRing({ loggedDays }: WeeklyRingProps) {
             stroke="currentColor"
             strokeWidth="10"
             strokeLinecap="round"
-            strokeDasharray={`${dash} ${C}`}
-            className="text-brand-500 transition-all duration-700 ease-out"
+            strokeDasharray={`${displayDash} ${C}`}
+            style={{ transition: 'stroke-dasharray 0.7s ease-out' }}
+            className="text-brand-500"
           />
         </svg>
         {/* Center text */}

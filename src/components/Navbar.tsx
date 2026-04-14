@@ -29,6 +29,9 @@ export default function Navbar({ dark, onToggleTheme }: NavbarProps) {
           <NavLink to="/history" className={linkClass}>
             History
           </NavLink>
+          <NavLink to="/settings" className={linkClass}>
+            Settings
+          </NavLink>
         </nav>
 
         {/* Theme toggle */}

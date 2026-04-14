@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import confetti from 'canvas-confetti';
 import type { WorkoutEntry } from '../types';
 import WeeklyRing from '../components/WeeklyRing';
 import StreakBadge from '../components/StreakBadge';
@@ -13,9 +14,18 @@ const MESSAGES = [
   "The hardest part was starting. You did it!",
 ];
 
+const MILESTONE_MESSAGES: Record<number, string> = {
+  3:  "3 days strong! You're on a roll! 🔥",
+  7:  "One full week! Incredible consistency! 🏆",
+  14: "Two weeks straight! You're unstoppable! ⚡",
+  30: "30 days! You're a legend! 🌟",
+};
+
+const TAGS = ['Gym', 'Run', 'Walk', 'Yoga', 'Other'];
+
 interface DashboardProps {
   entries: WorkoutEntry[];
-  onLog: () => void;
+  onLog: (tag?: string) => void;
 }
 
 function toDateKey(ts: number) {
@@ -52,17 +62,36 @@ function alreadyLoggedToday(entries: WorkoutEntry[]): boolean {
 export default function Dashboard({ entries, onLog }: DashboardProps) {
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
+  const [ringPulse, setRingPulse] = useState(false);
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
   const streak = useMemo(() => computeStreak(entries), [entries]);
   const loggedToday = useMemo(() => alreadyLoggedToday(entries), [entries]);
   const loggedDays = useMemo(() => [...new Set(entries.map(e => toDateKey(e.timestamp)))], [entries]);
 
+  function fireConfetti() {
+    const colors = ['#8b5cf6', '#6366f1', '#ffffff', '#f59e0b'];
+    confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 }, colors });
+    setTimeout(() => confetti({ particleCount: 40, spread: 120, origin: { y: 0.55 }, colors }), 200);
+  }
+
   function handleLog() {
     if (loggedToday) return;
-    onLog();
-    const msg = MESSAGES[Math.floor(Math.random() * MESSAGES.length)];
+    onLog(selectedTag ?? undefined);
+
+    // Haptic feedback
+    try { navigator.vibrate?.(80); } catch (_) { /* ignore */ }
+
+    const newStreak = streak + 1;
+    const milestoneMsg = MILESTONE_MESSAGES[newStreak];
+    const msg = milestoneMsg ?? MESSAGES[Math.floor(Math.random() * MESSAGES.length)];
     setToastMsg(msg);
     setToastVisible(true);
+
+    fireConfetti();
+
+    setRingPulse(true);
+    setTimeout(() => setRingPulse(false), 800);
   }
 
   return (
@@ -87,8 +116,32 @@ export default function Dashboard({ entries, onLog }: DashboardProps) {
         <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-6">
           Weekly Consistency
         </h2>
-        <WeeklyRing loggedDays={loggedDays} />
+        <WeeklyRing loggedDays={loggedDays} pulse={ringPulse} />
       </section>
+
+      {/* Workout Type Tags */}
+      {!loggedToday && (
+        <div className="w-full flex flex-col items-center gap-3">
+          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+            What did you do? (optional)
+          </p>
+          <div className="flex flex-wrap justify-center gap-2">
+            {TAGS.map(tag => (
+              <button
+                key={tag}
+                onClick={() => setSelectedTag(prev => prev === tag ? null : tag)}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-150
+                  ${selectedTag === tag
+                    ? 'bg-brand-500 text-white shadow-md shadow-brand-500/30'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  }`}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* One-Tap Button */}
       <button
@@ -102,7 +155,9 @@ export default function Dashboard({ entries, onLog }: DashboardProps) {
             : 'bg-brand-600 hover:bg-brand-500 active:scale-95 text-white shadow-brand-600/40 hover:shadow-brand-500/50 hover:shadow-xl'
           }`}
       >
-        {loggedToday ? '✓ Done for today' : '+ Log Workout'}
+        {loggedToday
+          ? '✓ Done for today'
+          : selectedTag ? `+ Log ${selectedTag}` : '+ Log Workout'}
       </button>
 
       <Toast

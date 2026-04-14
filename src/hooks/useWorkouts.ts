@@ -18,11 +18,12 @@ function save(entries: WorkoutEntry[]): void {
 export function useWorkouts() {
   const [entries, setEntries] = useState<WorkoutEntry[]>(load);
 
-  const logWorkout = useCallback(() => {
+  const logWorkout = useCallback((tag?: string) => {
     const entry: WorkoutEntry = {
       id: crypto.randomUUID(),
       timestamp: Date.now(),
       label: 'Workout Logged',
+      tag,
     };
     setEntries(prev => {
       const next = [entry, ...prev];
@@ -32,5 +33,10 @@ export function useWorkouts() {
     return entry;
   }, []);
 
-  return { entries, logWorkout };
+  const resetWorkouts = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    setEntries([]);
+  }, []);
+
+  return { entries, logWorkout, resetWorkouts };
 }
