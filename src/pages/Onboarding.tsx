@@ -24,7 +24,7 @@ const SLIDES = [
   },
 ] as const;
 
-export default function Onboarding() {
+export default function Onboarding({ onComplete }: { onComplete?: () => void }) {
   const [step, setStep] = useState(0);
   const navigate = useNavigate();
 
@@ -34,6 +34,7 @@ export default function Onboarding() {
   function handleNext() {
     if (isLast) {
       localStorage.setItem(ONBOARDING_KEY, 'true');
+      onComplete?.();
       navigate('/');
     } else {
       setStep(s => s + 1);
@@ -103,6 +104,7 @@ export default function Onboarding() {
           <button
             onClick={() => {
               localStorage.setItem(ONBOARDING_KEY, 'true');
+              onComplete?.();
               navigate('/');
             }}
             aria-label="Skip onboarding"

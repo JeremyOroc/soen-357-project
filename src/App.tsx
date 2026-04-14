@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useState } from 'react';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import History from './pages/History';
@@ -9,7 +10,9 @@ import { useTheme } from './hooks/useTheme';
 function AppRoutes() {
   const { entries, logWorkout } = useWorkouts();
   const { dark, toggle } = useTheme();
-  const hasOnboarded = localStorage.getItem(ONBOARDING_KEY) === 'true';
+  const [hasOnboarded, setHasOnboarded] = useState(() =>
+    localStorage.getItem(ONBOARDING_KEY) === 'true'
+  );
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0f0d1a] text-slate-800 dark:text-slate-100 transition-colors duration-300">
@@ -17,7 +20,7 @@ function AppRoutes() {
         {/* Onboarding — shown only on first visit, no Navbar */}
         <Route
           path="/welcome"
-          element={<Onboarding />}
+          element={<Onboarding onComplete={() => setHasOnboarded(true)} />}
         />
 
         {/* Main app routes */}
