@@ -1,6 +1,8 @@
 @import "tailwindcss";
-
+@custom-variant dark (&:where(.dark, .dark *));
 @theme {
+  --color-surface-dark: #0f0d1a;
+  --color-card-dark: #1a1728;
   --color-brand-50: #f5f3ff;
   --color-brand-100: #ede9fe;
   --color-brand-200: #ddd6fe;
@@ -24,7 +26,21 @@
   box-sizing: border-box;
 }
 
+/* Apply transition to everything, or specifically to background/colors */
+* {
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+              border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+              color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+html.dark {
+  background-color: #0f0d1a;
+  color: #f3f4f6;
+}
+
 body {
+  transition: background-color 0.3s ease, color 0.3s ease;
   margin: 0;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;

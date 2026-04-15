@@ -5,6 +5,7 @@ import type { WorkoutEntry } from '../types';
 import WeeklyRing from '../components/WeeklyRing';
 import StreakBadge from '../components/StreakBadge';
 import Toast from '../components/Toast';
+import MonthlyRing from '../components/MonthlyRing';
 
 /**
  * Dashboard Page - One-Tap Logging Interface
@@ -258,10 +259,32 @@ export default function Dashboard({ entries, onLog }: DashboardProps) {
       </div>
 
       {/* Weekly Ring */}
-      <section className="w-full bg-white dark:bg-[#1a1728] rounded-3xl p-6 shadow-sm border border-slate-100 dark:border-slate-700/50 flex flex-col items-center animate-fade-in" style={{ animationDelay: '200ms' }}>
-        <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-6">Weekly Consistency</h2>
+
+<section className="w-full bg-white dark:bg-[#1a1728] rounded-3xl p-6 shadow-sm border border-slate-100 dark:border-slate-700/50">
+  <div className="grid grid-cols-10 gap-2 items-stretch">
+    
+    {/* Weekly Progress (70%) */}
+    <div className="col-span-7 flex flex-col items-center">
+      <h2 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-6">
+        Weekly Consistency
+      </h2>
+      <div className="w-full flex justify-center pb-2">
         <WeeklyRing loggedDays={loggedDays} pulse={ringPulse} />
-      </section>
+      </div>
+    </div>
+
+    {/* Monthly Progress (30%) */}
+    <div className="col-span-3 flex flex-col items-center border-l border-slate-100 dark:border-slate-800 pl-4">
+      <h2 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-6">
+        Monthly
+      </h2>
+      <div className="flex items-center justify-center scale-150 origin-center mt-7">
+        <MonthlyRing loggedDays={loggedDays} />
+      </div>
+    </div>
+
+  </div>
+</section>
 
       {/* Workout Type Tags - HCI: Flexibility & Efficiency (Nielsen #7) */}
       {!loggedToday && (

@@ -32,6 +32,7 @@ function AppRoutes() {
           element={
             hasOnboarded ? (
               <>
+              <div className="min-h-screen transition-colors duration-500 ease-in-out bg-slate-50 dark:bg-[#0f0d1a] text-slate-800 dark:text-slate-100">
                 <Navbar dark={dark} onToggleTheme={toggle} />
                 <Routes>
                   <Route path="/" element={<Dashboard entries={entries} onLog={logWorkout} />} />
@@ -41,6 +42,7 @@ function AppRoutes() {
                   <Route path="/study-data" element={<StudyData />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
+              </div>
               </>
             ) : (
               <Navigate to="/welcome" replace />
