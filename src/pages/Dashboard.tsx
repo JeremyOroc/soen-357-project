@@ -5,6 +5,7 @@ import type { WorkoutEntry } from '../types';
 import WeeklyRing from '../components/WeeklyRing';
 import StreakBadge from '../components/StreakBadge';
 import Toast from '../components/Toast';
+import MonthlyRing from '../components/MonthlyRing';
 
 /**
  * Dashboard Page - One-Tap Logging Interface
