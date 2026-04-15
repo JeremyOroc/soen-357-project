@@ -1,25 +1,24 @@
-import { useState, useEffect } from 'react';
-
+import { useEffect, useState } from 'react';
+ 
+const THEME_KEY = 'kmf_theme';
+ 
 export function useTheme() {
-  const [dark, setDark] = useState(() => {
-    // Check local storage or system preference on initial load
-    const saved = localStorage.getItem('theme');
-    if (saved) return saved === 'dark';
+  const [dark, setDark] = useState<boolean>(() => {
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved !== null) return saved === 'dark';
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
-
+ 
   useEffect(() => {
-    const root = window.document.documentElement;
+    const root = document.documentElement;
     if (dark) {
       root.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
     } else {
       root.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
     }
+    localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light');
   }, [dark]);
-
-  const toggle = () => setDark(!dark);
-
-  return { dark, toggle };
+ 
+  return { dark, toggle: () => setDark(d => !d) };
 }
+ 

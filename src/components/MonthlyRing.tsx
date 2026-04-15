@@ -20,15 +20,21 @@ export default function MonthlyRing({ loggedDays }: { loggedDays: string[] }) {
   return (
     <div className="relative flex items-center justify-center">
       <svg width="80" height="80" className="transform -rotate-90">
+        {/* Background Track - Updated to match WeeklyRing */}
         <circle
-          cx="40" cy="40" r={radius}
+          cx="40"
+          cy="40"
+          r={radius}
           stroke="currentColor"
           strokeWidth="6"
           fill="transparent"
-          className="text-slate-100 dark:text-slate-800/50"
+          className="text-slate-200 dark:text-slate-700"
         />
+        {/* Progress Ring - Matches text-brand-500 */}
         <circle
-          cx="40" cy="40" r={radius}
+          cx="40"
+          cy="40"
+          r={radius}
           stroke="currentColor"
           strokeWidth="6"
           fill="transparent"
@@ -39,7 +45,8 @@ export default function MonthlyRing({ loggedDays }: { loggedDays: string[] }) {
         />
       </svg>
       <div className="absolute flex flex-col items-center leading-none">
-        <span className="text-sm font-bold text-slate-800 dark:text-white">
+        {/* Updated text color for dark mode consistency */}
+        <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
           {stats.percentage}%
         </span>
       </div>

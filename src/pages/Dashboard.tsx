@@ -278,7 +278,7 @@ export default function Dashboard({ entries, onLog }: DashboardProps) {
       <h2 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-6">
         Monthly
       </h2>
-      <div className="flex items-center justify-center scale-150 origin-center mt-9">
+      <div className="flex items-center justify-center scale-150 origin-center mt-7">
         <MonthlyRing loggedDays={loggedDays} />
       </div>
     </div>
