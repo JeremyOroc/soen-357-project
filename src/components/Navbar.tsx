@@ -1,3 +1,4 @@
+// filepath: /Users/sa7g/Desktop/soen-357-project/src/components/Navbar.tsx
 import { NavLink } from 'react-router-dom';
 
 interface NavbarProps {
@@ -13,9 +14,10 @@ export default function Navbar({ dark, onToggleTheme }: NavbarProps) {
     <header className="w-full border-b border-slate-200 dark:border-slate-700/50 bg-white/80 dark:bg-[#0f0d1a]/80 backdrop-blur-md sticky top-0 z-40">
       <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
         <span className="font-bold text-brand-600 dark:text-brand-400 tracking-tight">KMF</span>
-        <nav className="flex items-center gap-4">
+        <nav className="flex items-center gap-3">
           <NavLink to="/" end className={linkClass}>Dashboard</NavLink>
           <NavLink to="/history" className={linkClass}>History</NavLink>
+          <NavLink to="/compare" className={linkClass}>Compare</NavLink>
           <NavLink to="/settings" className={linkClass}>Settings</NavLink>
         </nav>
         <button
