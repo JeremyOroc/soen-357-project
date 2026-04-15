@@ -19,10 +19,18 @@ export function useWorkouts() {
   const [entries, setEntries] = useState<WorkoutEntry[]>(load);
 
   const logWorkout = useCallback((tag?: string) => {
+    const tagLabels: Record<string, string> = {
+      gym: '🏋️ Gym',
+      run: '🏃 Run',
+      walk: '🚶 Walk',
+      yoga: '🧘 Yoga',
+      other: '⚡ Other',
+    };
+    
     const entry: WorkoutEntry = {
       id: crypto.randomUUID(),
       timestamp: Date.now(),
-      label: 'Workout Logged',
+      label: tag ? tagLabels[tag] || 'Workout Logged' : 'Workout Logged',
       tag,
     };
     setEntries(prev => {
