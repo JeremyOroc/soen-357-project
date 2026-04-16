@@ -1,73 +1,111 @@
-# React + TypeScript + Vite
+# Keep Moving Forward
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Keep Moving Forward is a React + TypeScript workout tracking application designed for an HCI-focused course project.
+The app explores how interface design can improve speed, clarity, and motivation when users log workouts.
 
-Currently, two official plugins are available:
+The project includes two different logging experiences:
+- A fast, one-tap logging flow (our primary design)
+- A traditional multi-input tracker (used as a comparison/control condition)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Study data from both experiences is stored locally and can be exported for analysis.
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19
+- TypeScript
+- Vite
+- React Router
+- Tailwind CSS
 
-## Expanding the ESLint configuration
+## Project Goals
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Make daily workout tracking quick and low-friction
+- Encourage consistency with streaks and progress feedback
+- Compare modern streamlined UX vs traditional form-based UX
+- Collect usability-study data for performance analysis
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## How To Run
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### 1. Clone the repository
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+git clone <your-repo-url>
+cd soen-357-project
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. Install dependencies
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
+
+### 3. Start the development server
+
+```bash
+npm run dev
+```
+
+### 4. Open in browser
+
+Open the local URL shown in your terminal (typically `http://localhost:5173`).
+
+## How The App Works
+
+### First Launch
+
+Users are guided through a short onboarding flow (`/welcome`) to explain the app concept.
+When onboarding is completed, the app stores this state in local storage and redirects to the main dashboard.
+
+### Daily Logging (Primary Interface)
+
+On the dashboard (`/`), users can log workouts with a single action.
+This view also shows consistency and motivation feedback (such as streak-related progress) to reinforce repeat use.
+
+### Workout History
+
+The history page (`/history`) shows previously logged entries grouped by day and supports CSV export.
+This gives users a simple way to review activity and extract records.
+
+### Traditional Tracker (Comparison Interface)
+
+The compare page (`/compare`) provides a more traditional, multi-field input flow.
+This interface is used as the control condition for usability comparison with the one-tap design.
+
+### Study Data View
+
+The study data page (`/study-data`) aggregates metrics from both interfaces, such as:
+- session duration
+- interaction counts (for the traditional tracker)
+- timestamps and interface type
+
+Facilitators can export the collected data to CSV for analysis.
+
+## Available Scripts
+
+- `npm run dev`: Runs the app in development mode with hot reload
+- `npm run build`: Type-checks and creates an optimized production build
+- `npm run preview`: Serves the production build locally for verification
+- `npm run lint`: Runs ESLint checks on the project
+
+## Main Routes
+
+- `/welcome`: Onboarding screens for first-time users
+- `/`: Dashboard with one-tap workout logging
+- `/history`: Logged workout history and CSV export
+- `/compare`: Traditional tracker interface for study comparison
+- `/settings`: Reset options for workout data
+- `/study-data`: Facilitator view of collected study metrics
+
+## Data & Storage Notes
+
+- The app currently stores workout and study data in browser local storage.
+- Onboarding completion is also persisted locally.
+- Clearing browser storage or using a different browser profile will reset saved data.
+
+## Team Members
+
+- Kenny Luo-Li — 40237402
+- Yassine Hajou — 40284609
+- Hawad Ahmad — 40276935
+- Jeremy Oroc — 40276001
+- Ahmed Eskaf — 40235587
