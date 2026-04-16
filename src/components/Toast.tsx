@@ -1,3 +1,5 @@
+// Temporary notification that slides up from the bottom of the screen,
+// stays for 2.5 seconds, then fades out automatically.
 import { useEffect, useState } from 'react';
 
 interface ToastProps {
@@ -9,6 +11,7 @@ interface ToastProps {
 export default function Toast({ message, visible, onHide }: ToastProps) {
   const [show, setShow] = useState(false);
 
+  // Show the toast, then auto-dismiss after 2.5s with a 300ms fade-out
   useEffect(() => {
     if (visible) {
       setShow(true);

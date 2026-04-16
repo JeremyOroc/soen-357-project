@@ -1,3 +1,4 @@
+// Settings page — shows app info and a two-step data reset button
 import { useState } from 'react';
 import { ONBOARDING_KEY } from './Onboarding';
 
@@ -8,6 +9,7 @@ interface SettingsProps {
 export default function Settings({ onReset }: SettingsProps) {
   const [confirming, setConfirming] = useState(false);
 
+  // First click shows a confirmation prompt, second click actually resets
   function handleReset() {
     if (!confirming) {
       setConfirming(true);

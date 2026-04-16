@@ -1,3 +1,4 @@
+/* Global styles — brand color tokens, animations, scrollbar, and accessibility */
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 @theme {
@@ -26,7 +27,7 @@
   box-sizing: border-box;
 }
 
-/* Apply transition to everything, or specifically to background/colors */
+/* Smooth color transitions when toggling dark/light mode */
 * {
   transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
               border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
@@ -47,7 +48,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Animations - HCI: Immediate visual feedback */
+/* Animations used for page transitions and workout-logged feedback */
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -109,13 +110,13 @@ body {
   background: #475569;
 }
 
-/* Focus styles for accessibility - HCI: Accessibility */
+/* Visible focus ring for keyboard navigation */
 :focus-visible {
   outline: 2px solid #8b5cf6;
   outline-offset: 2px;
 }
 
-/* Reduced motion preference - HCI: Accessibility */
+/* Disable animations for users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

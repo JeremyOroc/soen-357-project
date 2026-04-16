@@ -1,12 +1,15 @@
+// SVG ring that fills based on how many days this week have a logged workout.
+// Also shows individual day pills (S M T W T F S) with checkmarks for logged days.
 import { useState, useEffect } from 'react';
 
 interface WeeklyRingProps {
-  loggedDays: string[];
-  pulse?: boolean;
+  loggedDays: string[];  // Array of "YYYY-MM-DD" date strings
+  pulse?: boolean;       // Briefly animate the ring when a new workout is logged
 }
 
 const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
+// Returns an array of 7 date strings for the current Sun–Sat week
 function getWeekDates(): string[] {
   const today = new Date();
   const dow = today.getDay();
@@ -17,6 +20,7 @@ function getWeekDates(): string[] {
   });
 }
 
+// SVG circle geometry
 const R = 54;
 const C = 2 * Math.PI * R;
 
@@ -26,6 +30,7 @@ export default function WeeklyRing({ loggedDays, pulse = false }: WeeklyRingProp
   const count = week.filter(d => loggedSet.has(d)).length;
   const targetDash = C * (count / 7);
 
+  // Animate from 0 to target on mount / when count changes
   const [dash, setDash] = useState(0);
 
   useEffect(() => {

@@ -1,3 +1,5 @@
+// History page — shows all past workouts grouped by date,
+// all-time stats, and a CSV export button.
 import { useState } from 'react';
 import type { WorkoutEntry } from '../types';
 import TotalStats from '../components/TotalStats';
@@ -17,6 +19,7 @@ function formatTime(ts: number): string {
   return new Date(ts).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 }
 
+// Bucket entries by their calendar date so we can render them in groups
 function groupByDate(entries: WorkoutEntry[]): Record<string, WorkoutEntry[]> {
   return entries.reduce<Record<string, WorkoutEntry[]>>((acc, e) => {
     const key = new Date(e.timestamp).toISOString().slice(0, 10);
@@ -25,7 +28,7 @@ function groupByDate(entries: WorkoutEntry[]): Record<string, WorkoutEntry[]> {
   }, {});
 }
 
-// CSV Export - HCI: User Control & Freedom (Nielsen #3)
+// Generates and downloads a CSV file of all workout entries
 function exportToCSV(entries: WorkoutEntry[]) {
   if (entries.length === 0) return;
   
@@ -74,7 +77,7 @@ export default function History({ entries }: HistoryProps) {
           </p>
         </div>
         
-        {/* Export Button - HCI: User Control & Freedom */}
+        {/* CSV export button */}
         {entries.length > 0 && (
           <button
             onClick={handleExport}

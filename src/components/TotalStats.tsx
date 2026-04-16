@@ -1,13 +1,17 @@
+// All-time statistics panel shown on the History page.
+// Computes totals, streaks, consistency rate, most active day, and favorite workout type.
 import type { WorkoutEntry } from '../types';
 
 interface StatsProps {
   entries: WorkoutEntry[];
 }
 
+// Converts a Unix timestamp to "YYYY-MM-DD"
 function toDateKey(ts: number) {
   return new Date(ts).toISOString().slice(0, 10);
 }
 
+// Derives all summary stats from the full list of workout entries
 function computeAllTimeStats(entries: WorkoutEntry[]) {
   if (entries.length === 0) {
     return { totalWorkouts: 0, uniqueDays: 0, longestStreak: 0, firstWorkout: null, mostActiveDay: null, favoriteWorkout: null };
@@ -18,7 +22,7 @@ function computeAllTimeStats(entries: WorkoutEntry[]) {
   const totalWorkouts = entries.length;
   const firstWorkout = new Date(Math.min(...entries.map(e => e.timestamp)));
 
-  // Calculate longest streak
+  // Walk through sorted unique days to find the longest run of consecutive dates
   let longestStreak = 1;
   let currentStreak = 1;
   for (let i = 1; i < days.length; i++) {
@@ -33,7 +37,7 @@ function computeAllTimeStats(entries: WorkoutEntry[]) {
     }
   }
 
-  // Most active day of week - HCI: Recognition over Recall
+  // Find which day of the week the user works out most often
   const dayCount: Record<number, number> = {};
   entries.forEach(e => {
     const day = new Date(e.timestamp).getDay();
@@ -43,7 +47,7 @@ function computeAllTimeStats(entries: WorkoutEntry[]) {
   const mostActiveDayNum = Object.entries(dayCount).sort((a, b) => b[1] - a[1])[0]?.[0];
   const mostActiveDay = mostActiveDayNum !== undefined ? dayNames[parseInt(mostActiveDayNum)] : null;
 
-  // Favorite workout type
+  // Find the most frequently used workout tag
   const tagCount: Record<string, number> = {};
   entries.forEach(e => {
     if (e.tag) {

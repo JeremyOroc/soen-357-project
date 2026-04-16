@@ -1,3 +1,4 @@
+// A single workout log entry stored in localStorage
 export interface WorkoutEntry {
   id: string;
   timestamp: number; // Unix ms
