@@ -1,3 +1,4 @@
+// Displays the user's current consecutive-day streak with a fire emoji
 interface StreakBadgeProps {
   streak: number;
 }

@@ -1,16 +1,8 @@
+// Study Data page — facilitator-only view (not in navbar, accessed via /study-data).
+// Merges metrics from both the One-Tap and Traditional interfaces,
+// shows summary averages, a session log table, and CSV export.
 import { useState, useMemo } from 'react';
 import Toast from '../components/Toast';
-
-/**
- * Study Data Page - Facilitator Only
- * 
- * HCI Purpose: This page displays all collected study metrics for analysis.
- * It is NOT linked in the navbar - only accessible via direct URL (/study-data).
- * 
- * Data Sources:
- * - kmf_study_dashboard: One-Tap logging sessions (time only)
- * - kmf_study_compare: Traditional tracker sessions (time + interactions)
- */
 
 interface DashboardSession {
   id: string;
@@ -98,6 +90,7 @@ export default function StudyData() {
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
 
+  // Merge both data sources into a single sorted list for display
   const combinedSessions = useMemo<CombinedSession[]>(() => {
     const dashboardSessions = loadDashboardSessions().map(s => ({
       id: s.id,
@@ -123,7 +116,7 @@ export default function StudyData() {
     });
   }, []);
 
-  // Compute averages
+  // Compute average duration and interactions for each interface type
   const stats = useMemo(() => {
     const oneTapSessions = combinedSessions.filter(s => s.interface === 'One-Tap');
     const traditionalSessions = combinedSessions.filter(s => s.interface === 'Traditional');
@@ -149,6 +142,7 @@ export default function StudyData() {
     };
   }, [combinedSessions]);
 
+  // Wipes all study data from both localStorage keys
   function handleClearAll() {
     if (!confirm('Are you sure you want to clear ALL study data? This cannot be undone.')) {
       return;

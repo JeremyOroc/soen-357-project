@@ -1,3 +1,5 @@
+// Three-slide onboarding walkthrough shown on first launch.
+// Introduces the app philosophy: show up, tap once, watch the ring fill.
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -31,6 +33,7 @@ export default function Onboarding({ onComplete }: { onComplete?: () => void }) 
   const isLast = step === SLIDES.length - 1;
   const slide = SLIDES[step];
 
+  // On the last slide this marks onboarding complete and goes to Dashboard
   function handleNext() {
     if (isLast) {
       localStorage.setItem(ONBOARDING_KEY, 'true');

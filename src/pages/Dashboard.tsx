@@ -1,3 +1,6 @@
+// Dashboard — the main screen and experimental condition of our user study.
+// Features One-Tap Logging with confetti, haptic feedback, and progress rings.
+// Also records session timing metrics for the study comparison.
 import { useState, useMemo, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import { v4 as uuidv4 } from 'uuid';
@@ -7,22 +10,7 @@ import StreakBadge from '../components/StreakBadge';
 import Toast from '../components/Toast';
 import MonthlyRing from '../components/MonthlyRing';
 
-/**
- * Dashboard Page - One-Tap Logging Interface
- * 
- * HCI Principles Applied:
- * - Fitts's Law: Large 80px button, easy to tap
- * - Nielsen #1 (Visibility of System Status): Immediate feedback via confetti, toast, ring pulse
- * - Nielsen #6 (Recognition over Recall): Visual progress, no data entry required
- * - Nielsen #7 (Flexibility & Efficiency): Optional workout tags for power users
- * - Fogg's Behavior Model: Positive reinforcement through celebrations
- * 
- * Study Metrics:
- * - Records session duration (startTime → button press) for comparison with Traditional Tracker
- * - Stored in localStorage under 'kmf_study_dashboard'
- */
-
-// Motivational messages - HCI: Positive reinforcement for habit formation
+// Random encouraging messages shown after logging a workout
 const MESSAGES = [
   "You showed up. That's everything. 💜",
   "Another day, another win. Keep going!",
@@ -32,7 +20,7 @@ const MESSAGES = [
   "The hardest part was starting. You did it!",
 ];
 
-// Milestone celebrations - HCI: Variable reward schedule (Fogg Behavior Model)
+// Special messages at streak milestones (3, 7, 14, 21, 30 days)
 const MILESTONE_MESSAGES: Record<number, string> = {
   3: "3 days strong! You're building a habit 🔥",
   7: "One full week! You're unstoppable 💜",
@@ -41,7 +29,7 @@ const MILESTONE_MESSAGES: Record<number, string> = {
   30: "30 days! You're a legend! 👑",
 };
 
-// Workout type tags - HCI: Flexibility & Efficiency of Use (Nielsen #7)
+// Optional tags the user can pick before logging
 const WORKOUT_TAGS = [
   { id: 'gym', emoji: '🏋️', label: 'Gym' },
   { id: 'run', emoji: '🏃', label: 'Run' },
@@ -50,7 +38,7 @@ const WORKOUT_TAGS = [
   { id: 'other', emoji: '⚡', label: 'Other' },
 ];
 
-// Daily motivational quotes - HCI: Emotional design & user engagement
+// One quote is shown per day, selected deterministically by day-of-year
 const DAILY_QUOTES = [
   { quote: "The only bad workout is the one that didn't happen.", author: "Unknown" },
   { quote: "Take care of your body. It's the only place you have to live.", author: "Jim Rohn" },
@@ -61,6 +49,7 @@ const DAILY_QUOTES = [
   { quote: "Your health is an investment, not an expense.", author: "Unknown" },
 ];
 
+// --- Study metrics: records how long it takes to log via the One-Tap interface ---
 const STUDY_STORAGE_KEY = 'kmf_study_dashboard';
 
 interface DashboardSession {
@@ -93,6 +82,7 @@ function toDateKey(ts: number) {
   return new Date(ts).toISOString().slice(0, 10);
 }
 
+// Counts consecutive days ending today (or yesterday) that have a workout
 function computeStreak(entries: WorkoutEntry[]): number {
   if (entries.length === 0) return 0;
   const days = [...new Set(entries.map(e => toDateKey(e.timestamp)))].sort().reverse();
@@ -110,12 +100,12 @@ function computeStreak(entries: WorkoutEntry[]): number {
   return streak;
 }
 
+// Only one log per calendar day is allowed
 function alreadyLoggedToday(entries: WorkoutEntry[]): boolean {
   const today = toDateKey(Date.now());
   return entries.some(e => toDateKey(e.timestamp) === today);
 }
 
-// Get daily quote based on day of year - ensures same quote all day
 function getDailyQuote() {
   const now = new Date();
   const start = new Date(now.getFullYear(), 0, 0);
@@ -124,6 +114,7 @@ function getDailyQuote() {
   return DAILY_QUOTES[dayOfYear % DAILY_QUOTES.length];
 }
 
+// Fires confetti — bigger burst for bigger milestones
 function triggerConfetti(intensity: 'normal' | 'medium' | 'large' = 'normal') {
   const colors = ['#8b5cf6', '#6366f1', '#ffffff', '#f59e0b'];
   const config = {
@@ -134,6 +125,7 @@ function triggerConfetti(intensity: 'normal' | 'medium' | 'large' = 'normal') {
   confetti({ ...config[intensity], colors, disableForReducedMotion: true });
 }
 
+// Short vibration on mobile devices (if supported)
 function triggerHaptic(pattern: 'single' | 'milestone' = 'single') {
   try {
     if ('vibrate' in navigator) {
@@ -148,20 +140,18 @@ export default function Dashboard({ entries, onLog }: DashboardProps) {
   const [ringPulse, setRingPulse] = useState(false);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
-  // Study metrics: Track session start time
+  // Timer starts when the page loads — used to measure how long it takes to log
   const startTimeRef = useRef<number>(Date.now());
-
-  // Reset timer on mount (for study sessions)
   useEffect(() => {
     startTimeRef.current = Date.now();
   }, []);
 
+  // Derived state from workout entries
   const streak = useMemo(() => computeStreak(entries), [entries]);
   const loggedToday = useMemo(() => alreadyLoggedToday(entries), [entries]);
   const loggedDays = useMemo(() => [...new Set(entries.map(e => toDateKey(e.timestamp)))], [entries]);
   const dailyQuote = useMemo(() => getDailyQuote(), []);
   
-  // Quick stats for dashboard - HCI: Recognition over Recall (Nielsen #6)
   const totalWorkouts = entries.length;
   const thisWeekCount = useMemo(() => {
     const now = new Date();
@@ -171,10 +161,11 @@ export default function Dashboard({ entries, onLog }: DashboardProps) {
     return entries.filter(e => e.timestamp >= startOfWeek.getTime()).length;
   }, [entries]);
 
+  // Core action: logs the workout, records study metrics, and triggers celebrations
   function handleLog() {
     if (loggedToday) return;
 
-    // Record study session metrics
+    // Save timing data for the user study comparison
     const endTime = Date.now();
     const session: DashboardSession = {
       id: uuidv4(),
@@ -184,12 +175,14 @@ export default function Dashboard({ entries, onLog }: DashboardProps) {
     };
     saveStudySession(session);
 
-    // Log the workout
     onLog(selectedTag || undefined);
     setSelectedTag(null);
+
+    // Briefly pulse the weekly ring to show the update
     setRingPulse(true);
     setTimeout(() => setRingPulse(false), 700);
 
+    // Milestone streaks get bigger celebrations
     const newStreak = streak + 1;
     if (MILESTONE_MESSAGES[newStreak]) {
       const intensity = newStreak <= 3 ? 'normal' : newStreak <= 14 ? 'medium' : 'large';
@@ -203,10 +196,10 @@ export default function Dashboard({ entries, onLog }: DashboardProps) {
     }
     setToastVisible(true);
 
-    // Reset timer for next session
     startTimeRef.current = Date.now();
   }
 
+  // Toggle a tag on/off (tapping the same tag again deselects it)
   function handleTagSelect(tagId: string) {
     setSelectedTag(prev => prev === tagId ? null : tagId);
   }
@@ -227,7 +220,7 @@ export default function Dashboard({ entries, onLog }: DashboardProps) {
         </p>
       </div>
 
-      {/* Daily Quote Card - HCI: Emotional Design */}
+      {/* Daily quote card */}
       <section className="w-full bg-gradient-to-br from-brand-50 to-indigo-50 dark:from-brand-900/20 dark:to-indigo-900/20 rounded-2xl p-4 border border-brand-100 dark:border-brand-800/30 animate-fade-in" style={{ animationDelay: '50ms' }}>
         <p className="text-sm text-slate-700 dark:text-slate-300 italic text-center">
           "{dailyQuote.quote}"
@@ -237,7 +230,7 @@ export default function Dashboard({ entries, onLog }: DashboardProps) {
         </p>
       </section>
 
-      {/* Quick Stats Row - HCI: Visibility of System Status (Nielsen #1) */}
+      {/* Quick stats: streak, this week, total */}
       <section className="w-full grid grid-cols-3 gap-3 animate-fade-in" style={{ animationDelay: '100ms' }}>
         <div className="bg-white dark:bg-[#1a1728] rounded-2xl p-3 text-center border border-slate-100 dark:border-slate-700/50">
           <p className="text-xl font-bold text-brand-600 dark:text-brand-400">{streak}</p>
@@ -263,7 +256,7 @@ export default function Dashboard({ entries, onLog }: DashboardProps) {
 <section className="w-full bg-white dark:bg-[#1a1728] rounded-3xl p-6 shadow-sm border border-slate-100 dark:border-slate-700/50">
   <div className="grid grid-cols-10 gap-2 items-stretch">
     
-    {/* Weekly Progress (70%) */}
+    {/* Weekly ring (takes 70% of the card width) */}
     <div className="col-span-7 flex flex-col items-center">
       <h2 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-6">
         Weekly Consistency
@@ -273,7 +266,7 @@ export default function Dashboard({ entries, onLog }: DashboardProps) {
       </div>
     </div>
 
-    {/* Monthly Progress (30%) */}
+    {/* Monthly ring (takes 30% of the card width) */}
     <div className="col-span-3 flex flex-col items-center border-l border-slate-100 dark:border-slate-800 pl-4">
       <h2 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-6">
         Monthly
@@ -286,7 +279,7 @@ export default function Dashboard({ entries, onLog }: DashboardProps) {
   </div>
 </section>
 
-      {/* Workout Type Tags - HCI: Flexibility & Efficiency (Nielsen #7) */}
+      {/* Optional workout type tags */}
       {!loggedToday && (
         <section className="w-full animate-fade-in" style={{ animationDelay: '250ms' }}>
           <p className="text-xs text-center text-slate-400 dark:text-slate-500 mb-3">
@@ -311,7 +304,7 @@ export default function Dashboard({ entries, onLog }: DashboardProps) {
         </section>
       )}
 
-      {/* One-Tap Log Button - HCI: Fitts's Law (large target, easy to tap) */}
+      {/* One-Tap Log Button */}
       <button
         onClick={handleLog}
         disabled={loggedToday}
@@ -322,7 +315,7 @@ export default function Dashboard({ entries, onLog }: DashboardProps) {
         {loggedToday ? '✓ Done for today' : '+ Log Workout'}
       </button>
 
-      {/* Encouragement text for beginners */}
+      {/* Tip shown only to new users (fewer than 7 entries) */}
       {!loggedToday && entries.length < 7 && (
         <p className="text-xs text-center text-slate-400 dark:text-slate-500 max-w-xs animate-fade-in" style={{ animationDelay: '350ms' }}>
           💡 Tip: You don't need to track reps or sets. Just show up and tap!

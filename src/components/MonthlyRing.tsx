@@ -1,11 +1,12 @@
-// MonthlyRing.tsx
+// Smaller SVG ring showing what percentage of the current month has logged workouts
 import { useMemo } from 'react';
 
 export default function MonthlyRing({ loggedDays }: { loggedDays: string[] }) {
+  // Count how many days this month have at least one log
   const stats = useMemo(() => {
     const now = new Date();
     const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-    const monthPrefix = now.toISOString().slice(0, 7);
+    const monthPrefix = now.toISOString().slice(0, 7); // e.g. "2026-04"
     const count = loggedDays.filter(day => day.startsWith(monthPrefix)).length;
     
     return {

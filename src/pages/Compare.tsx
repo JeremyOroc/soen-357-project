@@ -1,23 +1,10 @@
+// Traditional Tracker — the CONTROL CONDITION in our user study.
+// Intentionally complex (exercise name, sets, reps, weight, notes)
+// to contrast with the One-Tap Dashboard. Records session duration
+// and total interaction count for comparison.
 import { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import Toast from '../components/Toast';
-
-/**
- * Traditional Tracker Comparison Page
- * 
- * HCI Purpose: This page serves as the CONTROL CONDITION in our user study.
- * It intentionally has HIGH cognitive load and HIGH interaction cost to contrast
- * with the One-Tap Dashboard (experimental condition).
- * 
- * Metrics Collected:
- * - Session duration (startTime → endTime)
- * - Total interaction count (clicks + keystrokes)
- * - Exercise data logged
- * 
- * References:
- * - Nielsen's Heuristics: This page violates several on purpose (complexity, recall over recognition)
- * - Sweller's Cognitive Load Theory: High extraneous load from form fields
- */
 
 interface Exercise {
   id: string;
@@ -69,11 +56,10 @@ export default function Compare() {
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   
-  // Study metrics
+  // Study metrics — timer starts on mount, counts every click and keystroke
   const startTimeRef = useRef<number>(Date.now());
   const interactionCountRef = useRef<number>(0);
 
-  // Track all interactions (clicks and keystrokes)
   useEffect(() => {
     startTimeRef.current = Date.now();
     interactionCountRef.current = 0;
@@ -113,6 +99,7 @@ export default function Compare() {
     setExercises(prev => prev.filter(ex => ex.id !== id));
   }
 
+  // Saves the session metrics and all filled-in exercises to localStorage
   function handleSaveSession() {
     const endTime = Date.now();
     const session: CompareSession = {

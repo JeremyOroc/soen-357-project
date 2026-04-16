@@ -1,4 +1,4 @@
-// filepath: /Users/sa7g/Desktop/soen-357-project/src/components/Navbar.tsx
+// Sticky top navigation bar with page links and dark/light theme toggle
 import { NavLink } from 'react-router-dom';
 
 interface NavbarProps {
@@ -7,6 +7,7 @@ interface NavbarProps {
 }
 
 export default function Navbar({ dark, onToggleTheme }: NavbarProps) {
+  // Active link gets brand color, inactive links are muted
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     `text-sm font-medium transition-colors ${isActive ? 'text-brand-500 dark:text-brand-400' : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100'}`;
 
